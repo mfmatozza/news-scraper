@@ -44,9 +44,21 @@ def summarize(text: str, n_sentences: int = 3) -> str:
     return " ".join(str(s) for s in sentences)
 
 
-def fetch_and_summarize(url: str):
-    """Stub for fetch_and_summarize"""
-    pass
+def fetch_and_summarize(topic: str, n: int = 5, sentences: int = 3) -> list[dict]:
+    articles = fetch_rss(topic, n)
+    if len(articles) < n:
+        print(f"  [info] Found {len(articles)} article(s) (requested {n})")
+    results = []
+    for article in articles:
+        try:
+            body = fetch_article_body(article["url"])
+        except Exception as e:
+            print(f"  [warning] Skipping fetch for '{article['title']}': {e}")
+            body = ""
+        text = body if body.strip() else article["description"]
+        summary = summarize(text, sentences)
+        results.append({**article, "summary": summary})
+    return results
 
 
 def save_output(data, filename: str):

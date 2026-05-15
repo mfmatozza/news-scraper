@@ -111,3 +111,40 @@ def test_fetch_rss_encodes_topic_in_url():
         fetch_rss("climate change", 5)
     called_url = mock_parse.call_args[0][0]
     assert "climate+change" in called_url or "climate%20change" in called_url
+
+
+def test_fetch_and_summarize_returns_results_with_summaries():
+    articles = [
+        {"title": "Article 1", "url": "https://a.com", "published": "2026-05-15", "description": "Desc 1."},
+        {"title": "Article 2", "url": "https://b.com", "published": "2026-05-15", "description": "Desc 2."},
+    ]
+    with patch("scraper.core.fetch_rss", return_value=articles), \
+         patch("scraper.core.fetch_article_body", return_value="Body text. " * 20), \
+         patch("scraper.core.summarize", return_value="Mock summary sentence."):
+        results = fetch_and_summarize("test", n=2, sentences=2)
+    assert len(results) == 2
+    assert results[0]["summary"] == "Mock summary sentence."
+    assert results[1]["summary"] == "Mock summary sentence."
+
+
+def test_fetch_and_summarize_falls_back_to_description_on_error():
+    articles = [
+        {"title": "Broken", "url": "https://broken.com", "published": "2026-05-15", "description": "Fallback desc."},
+    ]
+    with patch("scraper.core.fetch_rss", return_value=articles), \
+         patch("scraper.core.fetch_article_body", side_effect=requests.RequestException("timeout")), \
+         patch("scraper.core.summarize", return_value="Summary from desc."):
+        results = fetch_and_summarize("test", n=1, sentences=2)
+    assert len(results) == 1
+    assert results[0]["summary"] == "Summary from desc."
+
+
+def test_fetch_and_summarize_falls_back_to_description_on_empty_body():
+    articles = [
+        {"title": "Paywall", "url": "https://paywall.com", "published": "2026-05-15", "description": "RSS snippet."},
+    ]
+    with patch("scraper.core.fetch_rss", return_value=articles), \
+         patch("scraper.core.fetch_article_body", return_value=""), \
+         patch("scraper.core.summarize", return_value="Summary from snippet."):
+        results = fetch_and_summarize("test", n=1, sentences=2)
+    assert results[0]["summary"] == "Summary from snippet."
