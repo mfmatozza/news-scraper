@@ -12,9 +12,19 @@ from sumy.summarizers.lex_rank import LexRankSummarizer
 _HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; news-scraper/1.0)"}
 
 
-def fetch_rss(url: str):
-    """Stub for fetch_rss"""
-    pass
+def fetch_rss(topic: str, n: int) -> list[dict]:
+    encoded = urllib.parse.quote_plus(topic)
+    url = f"https://news.google.com/rss/search?q={encoded}&hl=en-US&gl=US&ceid=US:en"
+    feed = feedparser.parse(url)
+    results = []
+    for entry in feed.entries[:n]:
+        results.append({
+            "title": getattr(entry, "title", ""),
+            "url": getattr(entry, "link", ""),
+            "published": getattr(entry, "published", ""),
+            "description": getattr(entry, "summary", ""),
+        })
+    return results
 
 
 def fetch_article_body(url: str) -> str:

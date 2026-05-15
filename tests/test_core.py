@@ -73,3 +73,41 @@ def test_fetch_article_body_raises_on_http_error():
     with patch("scraper.core.requests.get", side_effect=requests.RequestException("timeout")):
         with pytest.raises(requests.RequestException):
             fetch_article_body("https://example.com/article")
+
+
+def _make_mock_entry(title="Test Title", link="https://example.com", published="Mon, 15 May 2026", summary="A description."):
+    entry = MagicMock()
+    entry.title = title
+    entry.link = link
+    entry.published = published
+    entry.summary = summary
+    return entry
+
+
+def test_fetch_rss_returns_list_of_dicts():
+    mock_feed = MagicMock()
+    mock_feed.entries = [_make_mock_entry()]
+    with patch("scraper.core.feedparser.parse", return_value=mock_feed):
+        result = fetch_rss("AI", 5)
+    assert len(result) == 1
+    assert result[0]["title"] == "Test Title"
+    assert result[0]["url"] == "https://example.com"
+    assert result[0]["published"] == "Mon, 15 May 2026"
+    assert result[0]["description"] == "A description."
+
+
+def test_fetch_rss_limits_to_n():
+    mock_feed = MagicMock()
+    mock_feed.entries = [_make_mock_entry(title=f"Article {i}") for i in range(10)]
+    with patch("scraper.core.feedparser.parse", return_value=mock_feed):
+        result = fetch_rss("AI", 3)
+    assert len(result) == 3
+
+
+def test_fetch_rss_encodes_topic_in_url():
+    mock_feed = MagicMock()
+    mock_feed.entries = []
+    with patch("scraper.core.feedparser.parse", return_value=mock_feed) as mock_parse:
+        fetch_rss("climate change", 5)
+    called_url = mock_parse.call_args[0][0]
+    assert "climate+change" in called_url or "climate%20change" in called_url
