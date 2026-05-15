@@ -47,9 +47,10 @@ def test_summarize_respects_sentence_count():
     assert len(result) > 0
 
 
-def _make_mock_response(html: str):
+def _make_mock_response(html: str, url: str = "https://example.com/article"):
     mock = MagicMock()
     mock.text = html
+    mock.url = url
     mock.raise_for_status = MagicMock()
     return mock
 
@@ -73,6 +74,14 @@ def test_fetch_article_body_raises_on_http_error():
     with patch("scraper.core.requests.get", side_effect=requests.RequestException("timeout")):
         with pytest.raises(requests.RequestException):
             fetch_article_body("https://example.com/article")
+
+
+def test_fetch_article_body_returns_empty_for_google_consent_redirect():
+    html = "<html><body><p>We use cookies and data to improve...</p></body></html>"
+    mock = _make_mock_response(html, url="https://consent.google.com/m?continue=...")
+    with patch("scraper.core.requests.get", return_value=mock):
+        result = fetch_article_body("https://news.google.com/rss/articles/CB123")
+    assert result == ""
 
 
 def _make_mock_entry(title="Test Title", link="https://example.com", published="Mon, 15 May 2026", summary="A description."):

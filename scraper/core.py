@@ -30,6 +30,10 @@ def fetch_rss(topic: str, n: int) -> list[dict]:
 def fetch_article_body(url: str) -> str:
     response = requests.get(url, headers=_HEADERS, timeout=10)
     response.raise_for_status()
+    # Google News RSS URLs should redirect to the real article site.
+    # If still on google.com after following redirects, we landed on a consent page.
+    if "google.com" in response.url:
+        return ""
     soup = BeautifulSoup(response.text, "lxml")
     paragraphs = [p.get_text(strip=True) for p in soup.find_all("p")]
     return " ".join(p for p in paragraphs if p)
