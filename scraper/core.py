@@ -61,6 +61,18 @@ def fetch_and_summarize(topic: str, n: int = 5, sentences: int = 3) -> list[dict
     return results
 
 
-def save_output(data, filename: str):
-    """Stub for save_output"""
-    pass
+def save_output(results: list[dict], topic: str, output_dir: str = ".") -> Path:
+    safe_topic = topic.replace(" ", "_").lower()
+    today = date.today().isoformat()
+    filename = f"news_{safe_topic}_{today}.txt"
+    path = Path(output_dir) / filename
+    lines = [f'=== News Summary: "{topic}" ({today}) ===\n']
+    for i, article in enumerate(results, 1):
+        lines.append(f"[{i}] {article['title']}")
+        lines.append(f"    Published: {article['published']}")
+        lines.append(f"    URL: {article['url']}")
+        lines.append(f"    Summary:")
+        lines.append(f"      {article['summary']}")
+        lines.append("")
+    path.write_text("\n".join(lines), encoding="utf-8")
+    return path

@@ -148,3 +148,29 @@ def test_fetch_and_summarize_falls_back_to_description_on_empty_body():
          patch("scraper.core.summarize", return_value="Summary from snippet."):
         results = fetch_and_summarize("test", n=1, sentences=2)
     assert results[0]["summary"] == "Summary from snippet."
+
+
+def test_save_output_creates_file(tmp_path):
+    results = [
+        {"title": "Test Article", "url": "https://example.com", "published": "2026-05-15", "summary": "This is the summary."},
+    ]
+    path = save_output(results, "test topic", str(tmp_path))
+    assert path.exists()
+    content = path.read_text(encoding="utf-8")
+    assert "Test Article" in content
+    assert "https://example.com" in content
+    assert "This is the summary." in content
+
+
+def test_save_output_filename_format(tmp_path):
+    results = [{"title": "T", "url": "u", "published": "p", "summary": "s"}]
+    path = save_output(results, "AI News", str(tmp_path))
+    today = date.today().isoformat()
+    assert path.name == f"news_ai_news_{today}.txt"
+
+
+def test_save_output_replaces_spaces_in_topic(tmp_path):
+    results = [{"title": "T", "url": "u", "published": "p", "summary": "s"}]
+    path = save_output(results, "climate change policy", str(tmp_path))
+    assert " " not in path.name
+    assert "climate_change_policy" in path.name
