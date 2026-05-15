@@ -22,14 +22,16 @@ def main() -> None:
     parser.add_argument("--topic", required=True, help="Topic to search for")
     parser.add_argument("--articles", type=int, default=5, help="Number of articles (default: 5)")
     parser.add_argument("--sentences", type=int, default=3, help="Sentences per summary (default: 3)")
-    parser.add_argument("--output-dir", default=".", help="Directory to save output file (default: .)")
+    parser.add_argument("--save", action="store_true", help="Save output to a .txt file")
+    parser.add_argument("--output-dir", default=".", help="Directory for saved file (default: .)")
     args = parser.parse_args()
 
     print(f'\nFetching news for: "{args.topic}"...\n')
     results = fetch_and_summarize(args.topic, args.articles, args.sentences)
     _print_results(results, args.topic)
-    path = save_output(results, args.topic, args.output_dir)
-    print(f"Output saved to: {path}")
+    if args.save:
+        path = save_output(results, args.topic, args.output_dir)
+        print(f"Output saved to: {path}")
 
 
 if __name__ == "__main__":

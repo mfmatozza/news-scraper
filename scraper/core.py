@@ -18,11 +18,13 @@ def fetch_rss(topic: str, n: int) -> list[dict]:
     feed = feedparser.parse(url)
     results = []
     for entry in feed.entries[:n]:
+        raw_desc = getattr(entry, "summary", "")
+        description = BeautifulSoup(raw_desc, "lxml").get_text(separator=" ", strip=True) if raw_desc else ""
         results.append({
             "title": getattr(entry, "title", ""),
             "url": getattr(entry, "link", ""),
             "published": getattr(entry, "published", ""),
-            "description": getattr(entry, "summary", ""),
+            "description": description,
         })
     return results
 
