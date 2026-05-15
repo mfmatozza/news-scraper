@@ -18,8 +18,11 @@ def fetch_rss(url: str):
 
 
 def fetch_article_body(url: str) -> str:
-    """Stub for fetch_article_body"""
-    pass
+    response = requests.get(url, headers=_HEADERS, timeout=10)
+    response.raise_for_status()
+    soup = BeautifulSoup(response.text, "lxml")
+    paragraphs = [p.get_text(strip=True) for p in soup.find_all("p")]
+    return " ".join(p for p in paragraphs if p)
 
 
 def summarize(text: str, n_sentences: int = 3) -> str:

@@ -45,3 +45,31 @@ def test_summarize_respects_sentence_count():
     # LexRank can't guarantee exactly N sentences, but result should be non-empty
     assert isinstance(result, str)
     assert len(result) > 0
+
+
+def _make_mock_response(html: str):
+    mock = MagicMock()
+    mock.text = html
+    mock.raise_for_status = MagicMock()
+    return mock
+
+
+def test_fetch_article_body_extracts_paragraphs():
+    html = "<html><body><p>First paragraph.</p><p>Second paragraph.</p></body></html>"
+    with patch("scraper.core.requests.get", return_value=_make_mock_response(html)):
+        result = fetch_article_body("https://example.com/article")
+    assert "First paragraph." in result
+    assert "Second paragraph." in result
+
+
+def test_fetch_article_body_skips_blank_paragraphs():
+    html = "<html><body><p>Real content.</p><p>   </p><p></p></body></html>"
+    with patch("scraper.core.requests.get", return_value=_make_mock_response(html)):
+        result = fetch_article_body("https://example.com/article")
+    assert result == "Real content."
+
+
+def test_fetch_article_body_raises_on_http_error():
+    with patch("scraper.core.requests.get", side_effect=requests.RequestException("timeout")):
+        with pytest.raises(requests.RequestException):
+            fetch_article_body("https://example.com/article")
