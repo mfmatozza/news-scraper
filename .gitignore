@@ -12,6 +12,10 @@ __pycache__/
 # News scraper output files
 news_*.txt
 
+# Downloaded release binaries
+news-scraper-windows.exe
+news-scraper-macos
+
 # IDE
 .vscode/
 .idea/
