@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "news-scraper"
+version = "1.0.0"
+description = "CLI tool to scrape and summarize news articles by topic"
+requires-python = ">=3.10"
+readme = "README.md"
+dependencies = [
+    "requests>=2.31.0",
+    "beautifulsoup4>=4.12.0",
+    "feedparser>=6.0.11",
+    "sumy>=0.11.0",
+    "lxml>=4.9.0",
+]
+
+[project.scripts]
+news-scraper = "news_scraper:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["scraper*"]
