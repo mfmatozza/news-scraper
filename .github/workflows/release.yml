@@ -1,0 +1,51 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            artifact: news-scraper-windows.exe
+          - os: macos-latest
+            artifact: news-scraper-macos
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt pyinstaller
+
+      - name: Download NLTK punkt_tab data
+        run: python -c "import nltk; nltk.download('punkt_tab')"
+
+      - name: Build binary
+        run: pyinstaller news_scraper.spec
+
+      - name: Rename binary
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" == "Windows" ]; then
+            mv "dist/news-scraper.exe" "dist/${{ matrix.artifact }}"
+          else
+            mv "dist/news-scraper" "dist/${{ matrix.artifact }}"
+          fi
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/${{ matrix.artifact }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
