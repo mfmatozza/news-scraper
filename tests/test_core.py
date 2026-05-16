@@ -120,6 +120,7 @@ def test_fetch_rss_encodes_topic_in_url():
         fetch_rss("climate change", 5)
     called_url = mock_parse.call_args[0][0]
     assert "climate+change" in called_url or "climate%20change" in called_url
+    assert "bing.com" in called_url
 
 
 def test_fetch_and_summarize_returns_results_with_summaries():

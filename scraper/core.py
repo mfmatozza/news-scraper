@@ -14,7 +14,7 @@ _HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; news-scraper/1.0)"}
 
 def fetch_rss(topic: str, n: int) -> list[dict]:
     encoded = urllib.parse.quote_plus(topic)
-    url = f"https://news.google.com/rss/search?q={encoded}&hl=en-US&gl=US&ceid=US:en"
+    url = f"https://www.bing.com/news/search?q={encoded}&format=rss&mkt=en-US"
     feed = feedparser.parse(url)
     results = []
     for entry in feed.entries[:n]:
