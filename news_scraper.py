@@ -1,3 +1,11 @@
+import sys
+import os
+
+# When running as a PyInstaller bundle, point NLTK to the bundled data directory
+if getattr(sys, 'frozen', False):
+    import nltk
+    nltk.data.path.insert(0, os.path.join(sys._MEIPASS, 'nltk_data'))
+
 import argparse
 from datetime import date
 from scraper.core import fetch_and_summarize, save_output
