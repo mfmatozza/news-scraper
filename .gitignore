@@ -1,0 +1,17 @@
+# Build artifacts
+dist/
+build/
+*.spec.bak
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# News scraper output files
+news_*.txt
+
+# IDE
+.vscode/
+.idea/
