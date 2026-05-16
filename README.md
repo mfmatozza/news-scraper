@@ -4,7 +4,7 @@ Scrape and summarize news articles on any topic — no Python required.
 
 ## Download
 
-Grab the latest binary from the [Releases page](https://github.com/YOUR_USERNAME/news-scraper/releases/latest):
+Grab the latest binary from the [Releases page](https://github.com/mfmatozza/news-scraper/releases/latest):
 
 | Platform | File |
 |---|---|
@@ -42,7 +42,7 @@ chmod +x news-scraper-macos
 Requires Python 3.10+.
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/news-scraper.git
+git clone https://github.com/mfmatozza/news-scraper.git
 cd news-scraper
 pip install -r requirements.txt
 python -c "import nltk; nltk.download('punkt_tab')"
