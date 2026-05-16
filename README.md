@@ -19,11 +19,15 @@ chmod +x news-scraper-macos
 
 ## Usage
 
+After downloading, open a terminal in the folder where you saved the binary and run:
+
 ```bash
-# Windows
+# Windows (PowerShell or Command Prompt)
+cd C:\Users\YourName\Downloads
 .\news-scraper-windows.exe --topic "artificial intelligence" --articles 5
 
 # macOS
+cd ~/Downloads
 ./news-scraper-macos --topic "artificial intelligence" --articles 5
 ```
 
